@@ -1,0 +1,13 @@
+{
+  "sourceMaps": true,
+  "jsc": {
+    "target": "es2017",
+    "loose": true,
+    "parser": {
+      "syntax": "typescript"
+    }
+  },
+  "module": {
+    "type": "commonjs"
+  }
+}

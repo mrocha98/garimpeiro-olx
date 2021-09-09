@@ -1,0 +1,45 @@
+{
+  "name": "olx-br-tracker",
+  "version": "1.0.0",
+  "description": "A web scraper that tracks OLX Brazil's products prices",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsnd --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
+    "build": "swc --delete-dir-on-start --quiet --out-dir dist/ src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrocha98/olx-br-tracker.git"
+  },
+  "keywords": [
+    "nodejs",
+    "scrapper",
+    "web-scraping",
+    "typescript",
+    "olx",
+    "puppeteer"
+  ],
+  "author": "Matheus Rocha <matheus_rocha98@outlook.com> (https://mrocha.xyz/)",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/mrocha98/olx-tracker/issues"
+  },
+  "homepage": "https://github.com/mrocha98/olx-tracker#readme",
+  "dependencies": {
+    "puppeteer": "^10.2.0",
+    "yargs": "^17.1.1"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.49",
+    "@swc/core": "^1.2.85",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.2"
+  }
+}
