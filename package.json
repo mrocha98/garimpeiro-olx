@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsnd --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
+    "dev:with-args": "npm run dev -- --uf sp --ddd 12 --regiao 'vale do paraiba' --cidade 'sao jose dos campos' --produto 'apartamento' --preco 100000",
     "build": "swc --delete-dir-on-start --quiet --out-dir dist/ src/"
   },
   "repository": {
@@ -27,6 +28,8 @@
   },
   "homepage": "https://github.com/mrocha98/olx-tracker#readme",
   "dependencies": {
+    "date-fns": "^2.23.0",
+    "lodash.isempty": "^4.4.0",
     "lodash.kebabcase": "^4.1.1",
     "puppeteer": "^10.2.0",
     "yargs": "^17.1.1"
@@ -34,6 +37,7 @@
   "devDependencies": {
     "@swc/cli": "^0.1.49",
     "@swc/core": "^1.2.85",
+    "@types/lodash.isempty": "^4.4.6",
     "@types/lodash.kebabcase": "^4.1.6",
     "@types/node": "^16.9.1",
     "@types/yargs": "^17.0.2",
