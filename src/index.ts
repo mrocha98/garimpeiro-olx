@@ -1,4 +1,3 @@
-import path from 'path'
 import puppeteer from 'puppeteer'
 
 import { getArgs } from './get-args'
@@ -14,9 +13,37 @@ async function bootstrap() {
     new UrlParser(uf, produto).getParsedUrl({ regiao, cidade, ordem })
   )
 
-  await page.screenshot({
-    path: path.resolve(__dirname, '..', 'teste.png'),
+  const evaluated = await page.evaluate(() => {
+    const adsList = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>('ul#ad-list li a')
+    )
+    const ads = adsList
+      .map((ad) => {
+        const children = Array.from(ad.children)[0]
+
+        const title = children.querySelector('h2')?.textContent
+        if (!title) return
+
+        const priceArray = Array.from(
+          children.querySelectorAll('div div div div p')
+        ).filter((element) => element.textContent?.startsWith('R$'))
+        if (!priceArray.length) return
+        const price = priceArray[0].textContent
+
+        const link = ad.href
+
+        return { link, title, price }
+      })
+      .filter(Boolean)
+
+    const nextPageLink = document.querySelector<HTMLAnchorElement>(
+      'a[data-lurker-detail="next_page"]'
+    )?.href
+
+    return JSON.stringify({ nextPageLink, ads }, null, 2)
   })
+
+  console.log(evaluated)
 
   await browser.close()
 }
