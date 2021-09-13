@@ -1,15 +1,15 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
-import ufs from './choices/uf'
-import ddds from './choices/ddd'
-import ordems from './choices/ordem'
+import ufs from '../choices/uf'
+import ddds from '../choices/ddd'
+import ordems from '../choices/ordem'
 
-export function getArgs() {
+export function getArgv() {
   return yargs(hideBin(process.argv)).options({
     uf: { choices: ufs, demandOption: true, alias: 'estado' },
     ddd: { choices: ddds },
-    regiao: { type: 'string' },
+    subregiao: { type: 'string', alias: 'sub-regiao' },
     cidade: { type: 'string' },
     produto: { type: 'string', demandOption: true },
     preco: { type: 'number', demandOption: true },
@@ -24,7 +24,7 @@ export function getArgs() {
     },
     ordem: {
       choices: ordems,
-      default: 'mais relevantes' as const,
+      default: 'mais relevantes',
       alias: 'ordernarPor',
     },
     intervalo: {
@@ -32,6 +32,13 @@ export function getArgs() {
       default: 60,
       description: 'Intervalo de tempo em minutos entre cada busca.',
       alias: 'delay',
+    },
+    paginas: {
+      type: 'number',
+      default: 0,
+      description:
+        'Número de páginas para verificar. Use 0 para não estabelecer um limite.',
+      alias: 'pags',
     },
     notificar: { type: 'boolean', default: true, alias: 'enviarNotificacao' },
   })

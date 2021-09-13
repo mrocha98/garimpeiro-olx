@@ -1,36 +1,38 @@
 import kebabCase from 'lodash.kebabcase'
 import isEmpty from 'lodash.isempty'
 
-import { UF } from './choices/uf'
-import { Ordem } from './choices/ordem'
+import { UF as State } from './choices/uf'
+import { Ordem as Order } from './choices/ordem'
 
-type getPasedUrlParams = {
-  regiao?: string
-  cidade?: string
-  ordem?: Ordem
+type Params = {
+  region: string
+  subRegion?: string
+  city?: string
+  order?: Order
 }
 
 export class UrlParser {
-  constructor(private readonly uf: UF, private readonly produto: string) {
-    this.produto = encodeURI(produto)
+  constructor(private readonly uf: State, private readonly product: string) {
+    this.product = encodeURI(product)
   }
 
-  getParsedUrl({ regiao, cidade, ordem }: getPasedUrlParams) {
-    const IS_REGIAO_EMPTY = isEmpty(regiao)
-    const parsedRegiao = IS_REGIAO_EMPTY ? '' : `/${kebabCase(regiao)}`
+  getParsedUrl({ region, subRegion, city, order }: Params) {
+    const IS_SUBREGION_EMPTY = isEmpty(subRegion)
+    const IS_CITY_EMPTY = isEmpty(city)
 
-    const IS_CIDADE_EMPTY = isEmpty(cidade)
-    const parsedCidade =
-      IS_REGIAO_EMPTY || IS_CIDADE_EMPTY ? '' : `/${kebabCase(cidade)}`
+    const parsedSubRegion = IS_SUBREGION_EMPTY ? '' : `/${kebabCase(subRegion)}`
+
+    const parsedCity =
+      IS_SUBREGION_EMPTY || IS_CITY_EMPTY ? '' : `/${kebabCase(city)}`
 
     const url = new URL(
-      `https://${this.uf}.olx.com.br/vale-do-paraiba-e-litoral-norte${parsedRegiao}${parsedCidade}`
+      `https://${this.uf}.olx.com.br/${region}${parsedSubRegion}${parsedCity}`
     )
 
-    url.searchParams.append('q', this.produto)
-    if (ordem === 'mais recentes') url.searchParams.append('sf', '1')
-    else if (ordem === 'menor preco') url.searchParams.append('sp', '2')
-
+    url.searchParams.append('q', this.product)
+    if (order === 'mais recentes') url.searchParams.append('sf', '1')
+    else if (order === 'menor preco') url.searchParams.append('sp', '2')
+    console.log(url.href)
     return url.href
   }
 }
