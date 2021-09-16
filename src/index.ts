@@ -39,20 +39,20 @@ async function bootstrap() {
     zone,
   })
 
-  const documents = await Promise.all(
-    urls.map(async ({ href }) => {
-      const { body, statusCode } = await got.get(href)
-      if (statusCode === 404) {
-        console.error(
-          `O endereço ${href} não é válido, tente novamente com outros valores`
-        )
-        process.exit(0)
-      }
-      return new JSDOM(body).window.document
-    })
-  )
-
   const handle = async () => {
+    const documents = await Promise.all(
+      urls.map(async ({ href }) => {
+        const { body, statusCode } = await got.get(href)
+        if (statusCode === 404) {
+          console.error(
+            `O endereço ${href} não é válido, tente novamente com outros valores`
+          )
+          process.exit(0)
+        }
+        return new JSDOM(body).window.document
+      })
+    )
+
     const start = new Date()
     console.log(
       `iniciando garimpo às ${formattedHour(start)} de ${formattedDate(
