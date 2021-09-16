@@ -1,5 +1,5 @@
 import kebabCase from 'lodash.kebabcase'
-import { minutesToMilliseconds } from 'date-fns'
+import minutesToMilliseconds from 'date-fns/minutesToMilliseconds'
 
 import { getArgv } from './get-argv'
 import { DDD } from '../choices/ddd'
@@ -11,23 +11,25 @@ export class ArgsParser {
       cidade,
       ddd,
       intervalo,
-      notificar,
       ordem,
       paginas,
       percentual,
       preco,
       produto,
-      subregiao,
+      zona,
       uf,
+      pararAoEncontrarOfertas,
+      notificarViaLog,
+      notificarViaDesktop,
     } = await getArgv().parseAsync()
 
     const city = kebabCase(cidade)
     const region = this.findRegion(ddd!)
     const percentage = Math.abs(percentual)
-    const pages = Math.abs(paginas)
+    const pages = paginas === 0 ? 1 : Math.abs(paginas)
     const interval = minutesToMilliseconds(intervalo)
     const price = Math.abs(preco)
-    const subRegion = kebabCase(subregiao)
+    const zone = kebabCase(zona)
 
     return {
       city,
@@ -39,8 +41,10 @@ export class ArgsParser {
       price,
       state: uf,
       product: produto,
-      subRegion,
-      notify: notificar,
+      zone,
+      notifyViaLog: notificarViaLog,
+      notifyViaDesktop: notificarViaDesktop,
+      stopOnMatch: pararAoEncontrarOfertas,
     }
   }
 

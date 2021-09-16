@@ -9,7 +9,7 @@ export function getArgv() {
   return yargs(hideBin(process.argv)).options({
     uf: { choices: ufs, demandOption: true, alias: 'estado' },
     ddd: { choices: ddds },
-    subregiao: { type: 'string', alias: 'sub-regiao' },
+    zona: { type: 'string' },
     cidade: { type: 'string' },
     produto: { type: 'string', demandOption: true },
     preco: { type: 'number', demandOption: true },
@@ -21,11 +21,12 @@ export function getArgv() {
         'Ex: preço R$100, percentual de 10%, ' +
         'o programa notificará quando o preço estiver entre R$90 e R$110. ' +
         'Use 0 caso queira monitorar com o preço exato.',
+      alias: 'porcentagem',
     },
     ordem: {
       choices: ordems,
       default: 'mais relevantes',
-      alias: 'ordernarPor',
+      alias: 'ordernar-por',
     },
     intervalo: {
       type: 'number',
@@ -35,11 +36,28 @@ export function getArgv() {
     },
     paginas: {
       type: 'number',
-      default: 0,
-      description:
-        'Número de páginas para verificar. Use 0 para não estabelecer um limite.',
+      default: 1,
+      description: 'Número de páginas para verificar.',
       alias: 'pags',
     },
-    notificar: { type: 'boolean', default: true, alias: 'enviarNotificacao' },
+    pararAoEncontrarOfertas: {
+      type: 'boolean',
+      default: true,
+      description: 'Finaliza a execução do programa ao encontrar ofertas.',
+      alias: 'parar-ao-encontrar-ofertas',
+    },
+    notificarViaLog: {
+      type: 'boolean',
+      default: true,
+      description: 'Loga no console quando encontra uma oferta.',
+      alias: 'notificar-via-log',
+    },
+    notificarViaDesktop: {
+      type: 'boolean',
+      default: true,
+      description:
+        'Emite uma notificação de desktop quando encontra uma oferta',
+      alias: 'notificar-via-desktop',
+    },
   })
 }

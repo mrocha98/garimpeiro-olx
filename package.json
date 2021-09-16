@@ -1,17 +1,17 @@
 {
-  "name": "olx-br-tracker",
+  "name": "garimpeiro-olx",
   "version": "1.0.0",
   "description": "A web scraper that tracks OLX Brazil's products prices",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsnd --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
-    "dev:with-args": "npm run dev -- --uf sp --ddd 12 --sub-regiao 'vale do paraiba' --cidade 'sao jose dos campos' --produto 'apartamento' --preco 200000",
+    "dev:with-args": "npm run dev -- --uf sp --ddd 12 --zona 'vale do paraiba' --cidade 'sao jose dos campos' --produto 'apartamento' --preco 300000 --paginas 3",
     "build": "swc --delete-dir-on-start --quiet --out-dir dist/ src/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrocha98/olx-br-tracker.git"
+    "url": "git+https://github.com/mrocha98/garimpeiro-olx.git"
   },
   "keywords": [
     "nodejs",
@@ -19,25 +19,29 @@
     "web-scraping",
     "typescript",
     "olx",
-    "puppeteer"
+    "olx-br",
+    "jsdom"
   ],
   "author": "Matheus Rocha <matheus_rocha98@outlook.com> (https://mrocha.xyz/)",
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/mrocha98/olx-tracker/issues"
+    "url": "https://github.com/mrocha98/garimpeiro-olx/issues"
   },
-  "homepage": "https://github.com/mrocha98/olx-tracker#readme",
+  "homepage": "https://github.com/mrocha98/garimpeiro-olx#readme",
   "dependencies": {
+    "chalk": "^4.1.2",
     "date-fns": "^2.23.0",
+    "got": "^11.8.2",
+    "jsdom": "^17.0.0",
     "lodash.isempty": "^4.4.0",
     "lodash.kebabcase": "^4.1.1",
     "node-notifier": "^10.0.0",
-    "puppeteer": "^10.2.0",
     "yargs": "^17.1.1"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.49",
     "@swc/core": "^1.2.85",
+    "@types/jsdom": "^16.2.13",
     "@types/lodash.isempty": "^4.4.6",
     "@types/lodash.kebabcase": "^4.1.6",
     "@types/node": "^14.17.15",

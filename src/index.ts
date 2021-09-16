@@ -1,63 +1,102 @@
-import puppeteer from 'puppeteer'
-import notifier from 'node-notifier'
+import got from 'got'
+import isEmpty from 'lodash.isempty'
+import addMilliseconds from 'date-fns/addMilliseconds'
+import { JSDOM } from 'jsdom'
 
-import { DataExtractor, ExtractedData } from './data-extractor'
 import { ArgsParser } from './args/args-parser'
-import { UrlParser } from './url-parser'
+import { UrlParser } from './urls/url-parser'
+import { getUrls } from './urls/get-urls'
+import { Ad, AdsExtractor } from './scrapings/ads-extractor'
+import { Scraper } from './scrapings/scraper'
 import { priceMatches } from './price-matches'
+import { logNotification } from './notifications/log'
+import { desktopNotification } from './notifications/desktop'
+import { formattedHour, formattedDate } from './dates/formatted'
 
 async function bootstrap() {
   const {
     state,
     product,
     region,
-    subRegion,
+    zone,
     city,
     order,
     interval,
     price,
     percentage,
+    pages,
+    stopOnMatch,
+    notifyViaDesktop,
+    notifyViaLog,
   } = await new ArgsParser().getParsedArgs()
 
-  const handle = async () => {
-    const browser = await puppeteer.launch()
-    const page = await browser.newPage()
+  const urlParser = new UrlParser(state, product)
 
-    await page.goto(
-      new UrlParser(state, product).getParsedUrl({
-        region,
-        subRegion,
-        city,
-        order,
-      })
-    )
+  const urls = getUrls(urlParser, pages, {
+    region,
+    city,
+    order,
+    zone,
+  })
 
-    const evaluated = await page.evaluate(new DataExtractor().extractFromPage)
-    const data = JSON.parse(evaluated) as ExtractedData
-    const matches = data.ads.filter((ad) =>
-      priceMatches(price, ad.price, percentage)
-    )
-
-    console.log(
-      `==========================================\t${new Date().toLocaleString()}\t==========================================`
-    )
-    console.log({ matches })
-    matches.forEach((match) => {
-      notifier.notify({
-        title: '🔥 OLX Tracker: Oferta encontrada!!! 🔥',
-        message: `${product} por R$ ${match.price}`,
-        open: match.link,
-        wait: true,
-      })
+  const documents = await Promise.all(
+    urls.map(async ({ href }) => {
+      const { body, statusCode } = await got.get(href)
+      if (statusCode === 404) {
+        console.error(
+          `O endereço ${href} não é válido, tente novamente com outros valores`
+        )
+        process.exit(0)
+      }
+      return new JSDOM(body).window.document
     })
+  )
+
+  const handle = async () => {
+    const start = new Date()
     console.log(
-      '=================================================================================================================='
+      `iniciando garimpo às ${formattedHour(start)} de ${formattedDate(
+        start
+      )}...`
     )
 
-    await browser.close()
+    const adsExtractor = new AdsExtractor()
+    const scraper = new Scraper(adsExtractor)
+
+    const scrapedAdsMap = scraper.scrapeAdsFromPages(documents)
+    const matches: Set<Ad> = new Set()
+    scrapedAdsMap.forEach((ads) =>
+      ads.forEach((ad) => {
+        if (priceMatches(price, ad.price, percentage)) matches.add(ad)
+      })
+    )
+
+    const HAS_MATCHES = !isEmpty(matches)
+
+    if (HAS_MATCHES) {
+      notifyViaLog &&
+        matches.forEach((ad) => logNotification(ad.title, ad.price, ad.link))
+
+      notifyViaDesktop &&
+        matches.forEach((ad) =>
+          desktopNotification(ad.title, ad.price, ad.link)
+        )
+
+      if (stopOnMatch) {
+        console.log('finalizando execução...')
+        process.exit(0)
+      }
+    } else {
+      console.log('nenhuma oferta encontrada...')
+    }
+
+    const nextIteration = addMilliseconds(new Date(), interval)
+    console.log(
+      `o próximo garimpo será executado às ${formattedHour(nextIteration)}...`
+    )
   }
 
-  setInterval(handle, interval) as ReturnType<typeof setInterval>
+  if (!stopOnMatch) setInterval(handle, interval)
   process.nextTick(handle)
 }
 
