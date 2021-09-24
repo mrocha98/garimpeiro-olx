@@ -55,14 +55,13 @@ async function bootstrap() {
 
     const start = new Date()
     console.log(
-      `iniciando garimpo às ${formattedHour(start)} de ${formattedDate(
+      '--------------',
+      `\niniciando garimpo às ${formattedHour(start)} de ${formattedDate(
         start
       )}...`
     )
 
-    const adsExtractor = new AdsExtractor()
-    const scraper = new Scraper(adsExtractor)
-
+    const scraper = new Scraper(new AdsExtractor())
     const scrapedAdsMap = scraper.scrapeAdsFromPages(documents)
     const matches: Set<Ad> = new Set()
     scrapedAdsMap.forEach((ads) =>
@@ -90,13 +89,17 @@ async function bootstrap() {
       console.log('nenhuma oferta encontrada...')
     }
 
-    const nextIteration = addMilliseconds(new Date(), interval)
-    console.log(
-      `o próximo garimpo será executado às ${formattedHour(nextIteration)}...`
-    )
+    const SHOULD_LOG_NEXT_ITERATION_TIME = !(HAS_MATCHES && stopOnMatch)
+
+    if (SHOULD_LOG_NEXT_ITERATION_TIME) {
+      const nextIteration = addMilliseconds(new Date(), interval)
+      console.log(
+        `o próximo garimpo será executado às ${formattedHour(nextIteration)}...`
+      )
+    }
   }
 
-  if (!stopOnMatch) setInterval(handle, interval)
+  setInterval(handle, interval)
   process.nextTick(handle)
 }
 
